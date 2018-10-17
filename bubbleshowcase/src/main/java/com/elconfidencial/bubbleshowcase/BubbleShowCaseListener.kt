@@ -7,6 +7,11 @@ package com.elconfidencial.bubbleshowcase
  */
 interface BubbleShowCaseListener {
     /**
+     * It is called when the user clicks on the next button
+     */
+    fun onNextClick(bubbleShowCase: BubbleShowCase)
+
+    /**
      * It is called when the user clicks on the targetView
      */
     fun onTargetClick(bubbleShowCase: BubbleShowCase)

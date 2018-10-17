@@ -9,11 +9,14 @@ import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import android.support.constraint.ConstraintLayout
 import android.support.v4.content.ContextCompat
+import android.support.v4.util.Preconditions
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import com.rd.PageIndicatorView
+import kotlinx.android.synthetic.main.view_bubble_message.view.*
 import java.lang.ref.WeakReference
 
 import java.util.ArrayList
@@ -29,11 +32,14 @@ class BubbleMessageView : ConstraintLayout {
     private var imageViewIcon: ImageView? = null
     private var textViewTitle: TextView? = null
     private var textViewSubtitle: TextView? = null
+    private var textViewNext: TextView? = null
     private var imageViewClose: ImageView? = null
+    private var pageIndicatorProgress: PageIndicatorView? = null
     private var showCaseMessageViewLayout: ConstraintLayout? = null
 
     private var targetViewScreenLocation: RectF? = null
-    private var mBackgroundColor: Int = ContextCompat.getColor(context, R.color.blue_default)
+    private var mBackgroundColor: Int = ContextCompat.getColor(context, R.color.blue)
+    private var hideArrow: Boolean = false
     private var arrowPositionList = ArrayList<BubbleShowCase.ArrowPosition>()
 
     private var paint: Paint? = null
@@ -66,7 +72,9 @@ class BubbleMessageView : ConstraintLayout {
         imageViewIcon = findViewById(R.id.imageViewShowCase)
         imageViewClose = findViewById(R.id.imageViewShowCaseClose)
         textViewTitle = findViewById(R.id.textViewShowCaseTitle)
-        textViewSubtitle = findViewById(R.id.textViewShowCaseText)
+        textViewSubtitle = findViewById(R.id.textViewShowCaseDescription)
+        textViewNext = findViewById(R.id.textViewShowCaseNext)
+        pageIndicatorProgress = findViewById(R.id.pageIndicatorProgress)
         showCaseMessageViewLayout = findViewById(R.id.showCaseMessageViewLayout)
     }
 
@@ -81,7 +89,7 @@ class BubbleMessageView : ConstraintLayout {
         }
 
         if(builder.mDisableCloseAction!=null && builder.mDisableCloseAction!!){
-            imageViewClose?.visibility = View.INVISIBLE
+            imageViewClose?.visibility = View.GONE
         }
 
         builder.mTitle?.let {
@@ -103,14 +111,28 @@ class BubbleMessageView : ConstraintLayout {
             textViewSubtitle?.setTextSize(TypedValue.COMPLEX_UNIT_SP, builder.mSubtitleTextSize!!.toFloat())
         }
         builder.mBackgroundColor?.let { mBackgroundColor = builder.mBackgroundColor!! }
+        hideArrow = builder.mHideArrow
         arrowPositionList = builder.mArrowPosition
         targetViewScreenLocation = builder.mTargetViewScreenLocation
+        textViewNext?.visibility = if (builder.mShowNext) View.VISIBLE else View.GONE
+        builder.mNextTextColor?.let {
+            textViewNext?.setTextColor(builder.mNextTextColor!!)
+        }
+        builder.mNextTextSize?.let {
+            textViewNext?.setTextSize(TypedValue.COMPLEX_UNIT_SP, builder.mNextTextSize!!.toFloat())
+        }
+        if (builder.mCurrentProgress != null && builder.mTotalProgress != null) {
+            pageIndicatorProgress?.count = builder.mTotalProgress!!
+            pageIndicatorProgress?.selection = builder.mCurrentProgress!!
+            pageIndicatorProgress?.visibility = View.VISIBLE
+        }
 
         setOnDismissListener(builder)
     }
 
-    private fun setOnDismissListener(builder: Builder){
-        imageViewClose?.setOnClickListener {builder.mListener?.onDismiss()}
+    private fun setOnDismissListener(builder: Builder) {
+        imageViewClose?.setOnClickListener { builder.mListener?.onDismiss() }
+        textViewNext?.setOnClickListener { builder.mListener?.onNext() }
     }
 
     //END REGION
@@ -134,7 +156,7 @@ class BubbleMessageView : ConstraintLayout {
         drawRectangle(canvas)
 
         for (arrowPosition in arrowPositionList) {
-            drawArrow(canvas, arrowPosition, targetViewScreenLocation)
+            if (!hideArrow) drawArrow(canvas, arrowPosition, targetViewScreenLocation)
         }
     }
 
@@ -215,7 +237,6 @@ class BubbleMessageView : ConstraintLayout {
         return targetViewLocationOnScreen!!.centerY() < ScreenUtils.getAxisYpositionOfViewOnScreen(this) + getSecurityArrowMargin() - ScreenUtils.getStatusBarHeight(context)
     }
 
-
     private fun drawRhombus(canvas: Canvas, paint: Paint?, x: Int, y: Int, width: Int) {
         val halfRhombusWidth = width / 2
 
@@ -248,6 +269,12 @@ class BubbleMessageView : ConstraintLayout {
         var mTextColor: Int? = null
         var mTitleTextSize: Int? = null
         var mSubtitleTextSize: Int? = null
+        var mHideArrow: Boolean = false
+        var mShowNext: Boolean = false
+        var mNextTextColor: Int? = null
+        var mNextTextSize: Int? = null
+        var mCurrentProgress: Int? = null
+        var mTotalProgress: Int? = null
         var mArrowPosition  = ArrayList<BubbleShowCase.ArrowPosition>()
         var mListener: OnDismissBubbleMessageViewListener? = null
 
@@ -306,9 +333,35 @@ class BubbleMessageView : ConstraintLayout {
             return this
         }
 
+        fun hideArrow(hideArrow: Boolean): Builder {
+            mHideArrow = hideArrow
+            return this
+        }
+
         fun arrowPosition(arrowPosition: List<BubbleShowCase.ArrowPosition>): Builder {
             mArrowPosition.clear()
             mArrowPosition.addAll(arrowPosition)
+            return this
+        }
+
+        fun showNext(showNext: Boolean): Builder {
+            mShowNext = showNext
+            return this
+        }
+
+        fun nextTextColor(textColor: Int?): Builder {
+            mNextTextColor = textColor
+            return this
+        }
+
+        fun nextTextSize(textSize: Int?): Builder {
+            mNextTextSize = textSize
+            return this
+        }
+
+        fun progress(currentProgress: Int?, totalProgress: Int?): Builder {
+            mCurrentProgress = currentProgress
+            mTotalProgress = totalProgress
             return this
         }
 

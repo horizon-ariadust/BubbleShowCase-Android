@@ -27,17 +27,23 @@ class BubbleShowCaseBuilder{
     internal var mShowOnce: String? = null
     internal var mIsFirstOfSequence: Boolean? = null
     internal var mIsLastOfSequence: Boolean? = null
+    internal var mHideArrow: Boolean = false
     internal val mArrowPositionList = ArrayList<BubbleShowCase.ArrowPosition>()
+    internal var mShowNext: Boolean = false
+    internal var mNextTextSize: Int? = null
+    internal var mNextTextColor: Int? = null
     internal var mTargetView: WeakReference<View>? = null
     internal var mBubbleShowCaseListener: BubbleShowCaseListener? = null
     internal var mSequenceShowCaseListener: SequenceShowCaseListener? = null
+    internal var mCurrentProgress: Int? = null
+    internal var mTotalProgress: Int? = null
 
     private var onGlobalLayoutListenerTargetView: ViewTreeObserver.OnGlobalLayoutListener? = null
 
     /**
      * Builder constructor. It needs an instance of the current activity to convert it to a weak reference in order to avoid memory leaks
      */
-    constructor(activity: Activity){
+    constructor(activity: Activity) {
         mActivity = WeakReference(activity)
     }
 
@@ -170,6 +176,40 @@ class BubbleShowCaseBuilder{
     }
 
     /**
+     * Hide arrow.
+     */
+    fun hideArrow(hideArrow: Boolean): BubbleShowCaseBuilder {
+        mHideArrow = hideArrow
+        return this
+    }
+
+    /**
+     * Show next button.
+     */
+    fun showNext(showNext: Boolean): BubbleShowCaseBuilder {
+        mShowNext = showNext
+        return this
+    }
+
+    /**
+     * Next text size in SP.
+     * - Default value -> 13 sp
+     */
+    fun nextTextSize(textSize: Int): BubbleShowCaseBuilder {
+        mNextTextSize = textSize
+        return this
+    }
+
+    /**
+     * Text color of the next button.
+     *  - White color will be set if this param is not defined
+     */
+    fun nextTextColor(color: Int): BubbleShowCaseBuilder {
+        mNextTextColor = color
+        return this
+    }
+
+    /**
      * Highlight mode. It represents the way that the target view will be highlighted
      * - VIEW_LAYOUT: Default value. All the view box is highlighted (the rectangle where the view is contained). Example: For a TextView, all the element is highlighted (characters and background)
      * - VIEW_SURFACE: Only the view surface is highlighted, but not the background. Example: For a TextView, only the characters will be highlighted
@@ -186,6 +226,15 @@ class BubbleShowCaseBuilder{
      */
     fun listener(bubbleShowCaseListener: BubbleShowCaseListener): BubbleShowCaseBuilder {
         mBubbleShowCaseListener = bubbleShowCaseListener
+        return this
+    }
+
+    /**
+     * Show progress for current view.
+     */
+    fun progress(currentProgress: Int, totalProgress: Int): BubbleShowCaseBuilder {
+        mCurrentProgress = currentProgress
+        mTotalProgress = totalProgress
         return this
     }
 

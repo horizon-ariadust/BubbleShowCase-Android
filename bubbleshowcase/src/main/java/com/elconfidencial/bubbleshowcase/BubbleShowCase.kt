@@ -65,9 +65,15 @@ class BubbleShowCase(builder: BubbleShowCaseBuilder){
     private val mDisableTargetClick: Boolean = builder.mDisableTargetClick
     private val mDisableCloseAction: Boolean = builder.mDisableCloseAction
     private val mHighlightMode: BubbleShowCase.HighlightMode? = builder.mHighlightMode
+    private val mHideArrow: Boolean = builder.mHideArrow
     private val mArrowPositionList: MutableList<ArrowPosition> = builder.mArrowPositionList
+    private val mShowNext: Boolean = builder.mShowNext
+    private val mNextTextColor: Int? = builder.mNextTextColor
+    private val mNextTextSize: Int? = builder.mNextTextSize
     private val mTargetView: WeakReference<View>? = builder.mTargetView
     private val mBubbleShowCaseListener: BubbleShowCaseListener?  = builder.mBubbleShowCaseListener
+    private val mCurrentProgress: Int? = builder.mCurrentProgress
+    private val mTotalProgress: Int? = builder.mTotalProgress
 
     //Sequence params
     private val mSequenceListener: SequenceShowCaseListener?  = builder.mSequenceShowCaseListener
@@ -156,6 +162,10 @@ class BubbleShowCase(builder: BubbleShowCaseBuilder){
     private fun getBubbleMessageViewBuilder(): BubbleMessageView.Builder{
         return BubbleMessageView.Builder()
                 .from(mActivity.get()!!)
+                .showNext(mShowNext)
+                .nextTextColor(mNextTextColor)
+                .nextTextSize(mNextTextSize)
+                .hideArrow(mHideArrow)
                 .arrowPosition(mArrowPositionList)
                 .backgroundColor(mBackgroundColor)
                 .textColor(mTextColor)
@@ -166,10 +176,16 @@ class BubbleShowCase(builder: BubbleShowCaseBuilder){
                 .image(mImage)
                 .closeActionImage(mCloseAction)
                 .disableCloseAction(mDisableCloseAction)
+                .progress(mCurrentProgress, mTotalProgress)
                 .listener(object : OnDismissBubbleMessageViewListener{
                     override fun onDismiss() {
                         dismiss()
                         mBubbleShowCaseListener?.onClose(this@BubbleShowCase)
+                    }
+
+                    override fun onNext() {
+                        dismiss()
+                        mBubbleShowCaseListener?.onNextClick(this@BubbleShowCase)
                     }
                 })
     }
@@ -194,7 +210,6 @@ class BubbleShowCase(builder: BubbleShowCaseBuilder){
         editor.apply()
     }
 
-
     /**
      * This function takes a screenshot of the targetView, creating an ImageView from it. This new ImageView is also set on the layout passed by param
      */
@@ -202,7 +217,7 @@ class BubbleShowCase(builder: BubbleShowCaseBuilder){
         if(targetView==null) return
 
         val targetScreenshot = takeScreenshot(targetView, mHighlightMode)
-        val targetScreenshotView = ImageView(mActivity.get()!!)
+        val targetScreenshotView = RoundedImageView(mActivity.get()!!)
         targetScreenshotView.setImageBitmap(targetScreenshot)
         targetScreenshotView.setOnClickListener {
             if(!mDisableTargetClick)

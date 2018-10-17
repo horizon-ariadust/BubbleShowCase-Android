@@ -8,4 +8,9 @@ interface OnDismissBubbleMessageViewListener {
      * It is called when a user dismiss the BubbleMessageView
      */
     fun onDismiss()
+
+    /**
+     * It is called when a user go to next BubbleMessageView
+     */
+    fun onNext()
 }
