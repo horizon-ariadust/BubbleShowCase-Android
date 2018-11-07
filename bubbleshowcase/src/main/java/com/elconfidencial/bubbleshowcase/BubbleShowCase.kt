@@ -231,7 +231,11 @@ class BubbleShowCase(builder: BubbleShowCaseBuilder){
 
         val targetViewParams = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
         targetViewParams.setMargins(getXposition(targetView), getYposition(targetView), getScreenWidth(mActivity.get()!!) - (getXposition(targetView) + targetView.width), 0)
-        foregroundLayout?.addView(AnimationUtils.setBouncingAnimation(targetScreenshotView, 0, DURATION_BEATING_ANIMATION), targetViewParams)
+        if (mEnableAnimation) {
+            foregroundLayout?.addView(AnimationUtils.setBouncingAnimation(targetScreenshotView, 0, DURATION_BEATING_ANIMATION), targetViewParams)
+        } else {
+            foregroundLayout?.addView(targetScreenshotView, targetViewParams)
+        }
     }
 
     /**
@@ -337,12 +341,8 @@ class BubbleShowCase(builder: BubbleShowCaseBuilder){
                 0,
                 if (isTablet()) getScreenWidth(mActivity.get()!!)/2 - ScreenUtils.dpToPx(MAX_WIDTH_MESSAGE_VIEW_TABLET)/2 else 0,
                 0)
-        if (mEnableAnimation) {
-            val animation = AnimationUtils.getScaleAnimation(0, DURATION_SHOW_CASE_ANIMATION)
-            foregroundLayout?.addView(AnimationUtils.setAnimationToView(bubbleMessageView, animation), showCaseParams)
-        } else {
-            foregroundLayout?.addView(bubbleMessageView, showCaseParams)
-        }
+        val animation = AnimationUtils.getScaleAnimation(0, DURATION_SHOW_CASE_ANIMATION)
+        foregroundLayout?.addView(AnimationUtils.setAnimationToView(bubbleMessageView, animation), showCaseParams)
     }
 
     private fun createViewId(): Int {
