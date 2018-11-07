@@ -1,7 +1,6 @@
 package com.elconfidencial.bubbleshowcase
 
 import android.content.Context
-import android.content.res.TypedArray
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
@@ -9,14 +8,12 @@ import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import android.support.constraint.ConstraintLayout
 import android.support.v4.content.ContextCompat
-import android.support.v4.util.Preconditions
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import com.rd.PageIndicatorView
-import kotlinx.android.synthetic.main.view_bubble_message.view.*
 import java.lang.ref.WeakReference
 
 import java.util.ArrayList
@@ -114,6 +111,7 @@ class BubbleMessageView : ConstraintLayout {
         hideArrow = builder.mHideArrow
         arrowPositionList = builder.mArrowPosition
         targetViewScreenLocation = builder.mTargetViewScreenLocation
+        textViewNext?.text = builder.mNextText
         textViewNext?.visibility = if (builder.mShowNext) View.VISIBLE else View.GONE
         builder.mNextTextColor?.let {
             textViewNext?.setTextColor(builder.mNextTextColor!!)
@@ -271,12 +269,14 @@ class BubbleMessageView : ConstraintLayout {
         var mSubtitleTextSize: Int? = null
         var mHideArrow: Boolean = false
         var mShowNext: Boolean = false
+        var mNextText: String = "Next"
         var mNextTextColor: Int? = null
         var mNextTextSize: Int? = null
         var mCurrentProgress: Int? = null
         var mTotalProgress: Int? = null
         var mArrowPosition  = ArrayList<BubbleShowCase.ArrowPosition>()
         var mListener: OnDismissBubbleMessageViewListener? = null
+        var mEnableAnimation: Boolean = true
 
         fun from(context: Context): Builder{
             mContext = WeakReference(context)
@@ -349,6 +349,11 @@ class BubbleMessageView : ConstraintLayout {
             return this
         }
 
+        fun nextText(text: String): Builder {
+            mNextText = text
+            return this
+        }
+
         fun nextTextColor(textColor: Int?): Builder {
             mNextTextColor = textColor
             return this
@@ -367,6 +372,11 @@ class BubbleMessageView : ConstraintLayout {
 
         fun listener(listener: OnDismissBubbleMessageViewListener?): Builder {
             mListener = listener
+            return this
+        }
+
+        fun enableAnimation(enableAnimation: Boolean): Builder {
+            mEnableAnimation = enableAnimation
             return this
         }
 

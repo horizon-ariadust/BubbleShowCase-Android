@@ -30,6 +30,7 @@ class BubbleShowCaseBuilder{
     internal var mHideArrow: Boolean = false
     internal val mArrowPositionList = ArrayList<BubbleShowCase.ArrowPosition>()
     internal var mShowNext: Boolean = false
+    internal var mNextText: String = "Next"
     internal var mNextTextSize: Int? = null
     internal var mNextTextColor: Int? = null
     internal var mTargetView: WeakReference<View>? = null
@@ -37,6 +38,7 @@ class BubbleShowCaseBuilder{
     internal var mSequenceShowCaseListener: SequenceShowCaseListener? = null
     internal var mCurrentProgress: Int? = null
     internal var mTotalProgress: Int? = null
+    internal var mEnableAnimation: Boolean = true
 
     private var onGlobalLayoutListenerTargetView: ViewTreeObserver.OnGlobalLayoutListener? = null
 
@@ -184,6 +186,14 @@ class BubbleShowCaseBuilder{
     }
 
     /**
+     * Set next button text.
+     */
+    fun nextText(text: String): BubbleShowCaseBuilder {
+        mNextText = text
+        return this
+    }
+
+    /**
      * Show next button.
      */
     fun showNext(showNext: Boolean): BubbleShowCaseBuilder {
@@ -235,6 +245,14 @@ class BubbleShowCaseBuilder{
     fun progress(currentProgress: Int, totalProgress: Int): BubbleShowCaseBuilder {
         mCurrentProgress = currentProgress
         mTotalProgress = totalProgress
+        return this
+    }
+
+    /**
+     * Enable view animation.
+     */
+    fun enableAnimation(enableAnimation: Boolean): BubbleShowCaseBuilder {
+        mEnableAnimation = enableAnimation
         return this
     }
 

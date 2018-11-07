@@ -67,6 +67,7 @@ class BubbleShowCase(builder: BubbleShowCaseBuilder){
     private val mHighlightMode: BubbleShowCase.HighlightMode? = builder.mHighlightMode
     private val mHideArrow: Boolean = builder.mHideArrow
     private val mArrowPositionList: MutableList<ArrowPosition> = builder.mArrowPositionList
+    private val mNextText: String = builder.mNextText
     private val mShowNext: Boolean = builder.mShowNext
     private val mNextTextColor: Int? = builder.mNextTextColor
     private val mNextTextSize: Int? = builder.mNextTextSize
@@ -74,6 +75,7 @@ class BubbleShowCase(builder: BubbleShowCaseBuilder){
     private val mBubbleShowCaseListener: BubbleShowCaseListener?  = builder.mBubbleShowCaseListener
     private val mCurrentProgress: Int? = builder.mCurrentProgress
     private val mTotalProgress: Int? = builder.mTotalProgress
+    private val mEnableAnimation: Boolean = builder.mEnableAnimation
 
     //Sequence params
     private val mSequenceListener: SequenceShowCaseListener?  = builder.mSequenceShowCaseListener
@@ -163,6 +165,7 @@ class BubbleShowCase(builder: BubbleShowCaseBuilder){
         return BubbleMessageView.Builder()
                 .from(mActivity.get()!!)
                 .showNext(mShowNext)
+                .nextText(mNextText)
                 .nextTextColor(mNextTextColor)
                 .nextTextSize(mNextTextSize)
                 .hideArrow(mHideArrow)
@@ -177,6 +180,7 @@ class BubbleShowCase(builder: BubbleShowCaseBuilder){
                 .closeActionImage(mCloseAction)
                 .disableCloseAction(mDisableCloseAction)
                 .progress(mCurrentProgress, mTotalProgress)
+                .enableAnimation(mEnableAnimation)
                 .listener(object : OnDismissBubbleMessageViewListener{
                     override fun onDismiss() {
                         dismiss()
@@ -333,8 +337,12 @@ class BubbleShowCase(builder: BubbleShowCaseBuilder){
                 0,
                 if (isTablet()) getScreenWidth(mActivity.get()!!)/2 - ScreenUtils.dpToPx(MAX_WIDTH_MESSAGE_VIEW_TABLET)/2 else 0,
                 0)
-        val animation = AnimationUtils.getScaleAnimation(0, DURATION_SHOW_CASE_ANIMATION)
-        foregroundLayout?.addView(AnimationUtils.setAnimationToView(bubbleMessageView, animation), showCaseParams)
+        if (mEnableAnimation) {
+            val animation = AnimationUtils.getScaleAnimation(0, DURATION_SHOW_CASE_ANIMATION)
+            foregroundLayout?.addView(AnimationUtils.setAnimationToView(bubbleMessageView, animation), showCaseParams)
+        } else {
+            foregroundLayout?.addView(bubbleMessageView, showCaseParams)
+        }
     }
 
     private fun createViewId(): Int {
